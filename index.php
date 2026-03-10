@@ -8,6 +8,17 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
+    <nav>
+        <ul>
+            <li><a>category</a></li>
+        </ul>
+    </nav>
+    <main>
+        insert list of food here
+    </main>
+    <section>
+        insert recipe here
+    </section>
     <script src="index.js"></script>
   </body>
 </html>
