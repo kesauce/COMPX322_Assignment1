@@ -23,6 +23,24 @@ nav{
     border-radius: 5px;
 }
 
+nav ul{
+    width: 100%;
+    height: 100%;
+    list-style-type: none;
+
+    padding: 0;
+    margin: 0;
+}
+
+nav li{
+    width: auto;
+    height: auto;
+    font-size: 1.3rem;
+
+    margin: 0.5rem;
+    text-align: center;
+}
+
 main{
    background-color: #b392ac;
     width: 50%;
