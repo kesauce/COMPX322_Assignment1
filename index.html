@@ -7,14 +7,17 @@
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
-    <nav>
-            <ul id="category-list">
-            </ul>
+        <nav>
+            <ul id="category-list"></ul>
+            <form method="post">
+                <select name="category" id="category">
+                </select>
+                <input id="category-submit" type="button" value="Add/Remove Category" />
+            </form>
         </nav>
         <main>
-            <ul id="food-list">
-            </ul>
-		</main>
+            <ul id="food-list"></ul>
+        </main>
         <section id="recipe"></section>
         <script src="script.js"></script>
     </body>

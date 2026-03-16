@@ -1,18 +1,49 @@
 /**
- * Grabs the selected categories from the database
+ * Grabs the selected categories from the database.
  */
 function getDatabase() {
+    // Store all the selected categories
+    let selectedCategories = [];
+    
     fetch("getCategories.php")
         .then((response) => response.json())
         .then((response) => {
+            // Grab the elements on the page
             const categoryList = document.getElementById("category-list");
+            const categorySelect = document.getElementById("category");
+
+            // List out the selected categories on the nav bar
             categoryList.innerHTML = response.data
-                .map(
-                    (category) => `
-                <li onClick=getFood("${category.strCategory}")><a>${category.strCategory}</a></li>
-            `,
-                )
+                .map((category) => {
+                    if (category.selected == 1) {
+                        return `<li onClick=getFood("${encodeURIComponent(category.strCategory)}")><a>${category.strCategory}</a></li>`;
+                    }
+                })
                 .join("");
+
+            // List out all the categories in select element
+            categorySelect.innerHTML =
+                `<option value="" disabled selected>Select a category</option>` +
+                response.data
+                    .map(
+                        (category) => `
+                    <option class="${category.selected == 1 ? "selected-category" : "unselected-category"}" value="${category.strCategory}">${category.strCategory}</option>
+                `,
+                    )
+                    .join("");
+
+            // Change the value of the submit button depending on the selected value in the select element
+            document.getElementById("category").addEventListener("change", function () {
+                const submit = document.getElementById("category-submit");
+
+                // Find the selected category from the response
+                const selectedOption = this.options[this.selectedIndex];
+
+                if (category[selectedOption]) {
+                    submit.value = "Remove Category";
+                } else {
+                    submit.value = "Add Category";                    }
+                });
         })
         .catch((error) => {
             console.error(`An error has occurred: ${error}`);
@@ -20,11 +51,37 @@ function getDatabase() {
 }
 
 /**
+ * Toggle the selected property of the given category in the database.
+ */
+function updateDatabase() {
+    // Grab the selected category and format it
+    const selectValue = document.getElementById("category").value;
+    const data = JSON.stringify({ category: selectValue });
+
+    // Send it to the php file
+    fetch("updateCategories.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json", // Inform the server the body is JSON
+        },
+        body: data,
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                // Get the database
+                getDatabase();
+            }
+        });
+}
+
+/**
  * Grabs the meals in a given category and displays it.
- * @param {String} category 
+ * @param {String} category
  */
 function getFood(category) {
-    const url = `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`;
+    const decodedCategory = decodeURIComponent(category);
+    const url = `https://www.themealdb.com/api/json/v1/1/filter.php?c=${decodedCategory}`;
     fetch(url)
         .then((response) => response.json())
         .then((response) => {
@@ -55,11 +112,11 @@ function getFood(category) {
 
 /**
  * Grab the recipe of a given meal and display it.
- * @param {String} food 
+ * @param {String} food
  */
 function getRecipe(food) {
     // Decode the food and make the fetch request
-    const decodedFood = decodeURIComponent(food); 
+    const decodedFood = decodeURIComponent(food);
     const url = `https://www.themealdb.com/api/json/v1/1/search.php?s=${decodedFood}`;
 
     fetch(url)
@@ -70,14 +127,22 @@ function getRecipe(food) {
             let ingredientList = [];
 
             // Grab all the ingredients if it's not null
-            for (let i = 1; i <= 20; i++){
+            for (let i = 1; i <= 20; i++) {
                 let ingredientKey = `strIngredient${i}`;
                 let measureKey = `strMeasure${i}`;
 
-                if (meal[measureKey] == null || meal[ingredientKey] == null || meal[measureKey] == "" || meal[ingredientKey] == "") continue;
+                if (
+                    meal[measureKey] == null ||
+                    meal[ingredientKey] == null ||
+                    meal[measureKey] == "" ||
+                    meal[ingredientKey] == ""
+                )
+                    continue;
 
-                ingredientList.push(`<li>${meal[measureKey]} ${meal[ingredientKey]}</li>`);
-            };
+                ingredientList.push(
+                    `<li>${meal[measureKey]} ${meal[ingredientKey]}</li>`,
+                );
+            }
 
             // Format the instructions
             let instructions = `<p>${meal.strInstructions}</p>`;
@@ -85,7 +150,7 @@ function getRecipe(food) {
             recipe.innerHTML = `
                 <h2>Ingredients</h2>
                 <ul>
-                ${ingredientList.join('')}
+                ${ingredientList.join("")}
                 </ul>
                 <h2>Instructions</h2>
                 ${instructions}
@@ -96,4 +161,5 @@ function getRecipe(food) {
         });
 }
 
+// Run when HTML loads
 getDatabase();
