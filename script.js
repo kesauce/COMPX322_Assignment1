@@ -2,9 +2,6 @@
  * Grabs the selected categories from the database.
  */
 function getDatabase() {
-    // Store all the selected categories
-    let selectedCategories = [];
-    
     fetch("getCategories.php")
         .then((response) => response.json())
         .then((response) => {
@@ -31,19 +28,6 @@ function getDatabase() {
                 `,
                     )
                     .join("");
-
-            // Change the value of the submit button depending on the selected value in the select element
-            document.getElementById("category").addEventListener("change", function () {
-                const submit = document.getElementById("category-submit");
-
-                // Find the selected category from the response
-                const selectedOption = this.options[this.selectedIndex];
-
-                if (category[selectedOption]) {
-                    submit.value = "Remove Category";
-                } else {
-                    submit.value = "Add Category";                    }
-                });
         })
         .catch((error) => {
             console.error(`An error has occurred: ${error}`);
@@ -62,7 +46,7 @@ function updateDatabase() {
     fetch("updateCategories.php", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json", // Inform the server the body is JSON
+            "Content-Type": "application/json", 
         },
         body: data,
     })
