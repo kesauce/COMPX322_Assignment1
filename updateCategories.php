@@ -6,7 +6,7 @@ $body = json_decode(file_get_contents("php://input"), true);
 $category = $body["category"];
 
 // Grab the row of the given category
-$stmt = $conn->prepare("SELECT selected FROM menucategories WHERE strCategory = (?)");
+$stmt = $conn->prepare("SELECT selected FROM menuCategories WHERE strCategory = (?)");
 $stmt->bind_param("s", $category);
 if ($stmt->execute()) {
     $selectedResult = $stmt->get_result();
@@ -14,7 +14,7 @@ if ($stmt->execute()) {
         // Toggle the selected column and update it with the new value
         $newResult = $row["selected"] == 1 ? 0 : 1;
 
-        $update = $conn->prepare("UPDATE menucategories SET selected = (?) WHERE strCategory = (?)");
+        $update = $conn->prepare("UPDATE menuCategories SET selected = (?) WHERE strCategory = (?)");
         $update->bind_param("is", $newResult, $category);
 
         if ($update->execute()){

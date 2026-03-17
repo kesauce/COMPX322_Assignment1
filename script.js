@@ -24,7 +24,7 @@ function getDatabase() {
                 response.data
                     .map(
                         (category) => `
-                    <option class="${category.selected == 1 ? "selected-category" : "unselected-category"}" value="${category.strCategory}">${category.strCategory}</option>
+                    <option value="${category.strCategory}">${category.strCategory}</option>
                 `,
                     )
                     .join("");

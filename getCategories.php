@@ -3,7 +3,7 @@ require_once("connect.php");
 
 // Query the database and store the result inside $categories
 $categories = [];
-$query = "SELECT * FROM menucategories";
+$query = "SELECT * FROM menuCategories";
 $result = $conn->query($query);
 
 if ($result == FALSE) {

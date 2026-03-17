@@ -58,14 +58,6 @@ nav form select, nav form input{
     margin: 0.5rem 0;
 }
 
-.selected-category{
-    color:green;
-}
-
-.unselected-category{
-    color:red;
-}
-
 main{
    background-color: #b392ac;
     width: 40%;
