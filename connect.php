@@ -2,7 +2,7 @@
 // $servername = "localhost";
 // $username = "root";
 // $password = "";
-// $dbname = "menucategories";
+// $dbname = "menu";
 $servername = "learn-mysql.cms.waikato.ac.nz";
 $username = "am1989";
 $password = "my476249sql";

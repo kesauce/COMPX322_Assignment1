@@ -3,32 +3,43 @@
  */
 function getDatabase() {
     fetch("getCategories.php")
-        .then((response) => response.json())
-        .then((response) => {
-            // Grab the elements on the page
-            const categoryList = document.getElementById("category-list");
-            const categorySelect = document.getElementById("category");
+        .then(
+            (response) => response.json(),
+            () => alert("There was an error with the response."),
+        )
+        .then(
+            (response) => {
+                // Grab the elements on the page
+                const categoryList = document.getElementById("category-list");
+                const categorySelect = document.getElementById("category");
 
-            // List out the selected categories on the nav bar
-            categoryList.innerHTML = response.data
-                .map((category) => {
-                    if (category.selected == 1) {
-                        return `<li onClick=getFood("${encodeURIComponent(category.strCategory)}")><a>${category.strCategory}</a></li>`;
-                    }
-                })
-                .join("");
+                // Check if the response is empty
+                if (response.data == null) {
+                    categoryList.innerHTML = `There was an error with the response`;
+                } else {
+                    // List out the selected categories on the nav bar
+                    categoryList.innerHTML = response.data
+                        .map((category) => {
+                            if (category.selected == 1) {
+                                return `<li onClick=getFood("${encodeURIComponent(category.strCategory)}")><a>${category.strCategory}</a></li>`;
+                            }
+                        })
+                        .join("");
 
-            // List out all the categories in select element
-            categorySelect.innerHTML =
-                `<option value="" disabled selected>Select a category</option>` +
-                response.data
-                    .map(
-                        (category) => `
+                    // List out all the categories in select element
+                    categorySelect.innerHTML =
+                        `<option value="" disabled selected>Select a category</option>` +
+                        response.data
+                            .map(
+                                (category) => `
                     <option value="${category.strCategory}">${category.strCategory}</option>
                 `,
-                    )
-                    .join("");
-        })
+                            )
+                            .join("");
+                }
+            },
+            () => alert("There was an error with handling the response."),
+        )
         .catch((error) => {
             console.error(`An error has occurred: ${error}`);
         });
@@ -46,17 +57,25 @@ function updateDatabase() {
     fetch("updateCategories.php", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json", 
+            "Content-Type": "application/json",
         },
         body: data,
     })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.success) {
-                // Get the database
-                getDatabase();
-            }
-        });
+        .then(
+            (response) => response.json(),
+            () => alert("There was an error with the response."),
+        )
+        .then(
+            (data) => {
+                if (data.success) {
+                    // Get the database
+                    getDatabase();
+                } else {
+                    alert("There was an error with the response.");
+                }
+            },
+            () => alert("There was an error with handling the response."),
+        );
 }
 
 /**
@@ -67,28 +86,34 @@ function getFood(category) {
     const decodedCategory = decodeURIComponent(category);
     const url = `https://www.themealdb.com/api/json/v1/1/filter.php?c=${decodedCategory}`;
     fetch(url)
-        .then((response) => response.json())
-        .then((response) => {
-            const foodList = document.getElementById("food-list");
+        .then(
+            (response) => response.json(),
+            () => alert("There was an error with the response."),
+        )
+        .then(
+            (response) => {
+                const foodList = document.getElementById("food-list");
 
-            // Check if the API returned empty
-            if (response.meals == null) {
-                foodList.innerHTML = `<p id="error">There are no meals in this category.</p>`;
-            } else {
-                // Map through the original response and add the following HTML with every item, ensuring that there is no comma in between each item in the new array
-                // Browser mistakes spaces in meal names as the end of an attribute - need to encode and decode it safely
-                foodList.innerHTML = response.meals
-                    .map(
-                        (meal) => `
+                // Check if the API returned empty
+                if (response.meals == null) {
+                    foodList.innerHTML = `<p id="error">There are no meals in this category.</p>`;
+                } else {
+                    // Map through the original response and add the following HTML with every item, ensuring that there is no comma in between each item in the new array
+                    // Browser mistakes spaces in meal names as the end of an attribute - need to encode and decode it safely
+                    foodList.innerHTML = response.meals
+                        .map(
+                            (meal) => `
                     <div onClick=getRecipe("${encodeURIComponent(meal.strMeal)}") class="meal-container">
                         <h1>${meal.strMeal}</h1>
                         <img src="${meal.strMealThumb}">
                     </div>
             `,
-                    )
-                    .join("");
-            }
-        })
+                        )
+                        .join("");
+                }
+            },
+            () => alert("There was an error with handling the response."),
+        )
         .catch((error) => {
             console.error(`An error has occurred: ${error}`);
         });
@@ -104,34 +129,43 @@ function getRecipe(food) {
     const url = `https://www.themealdb.com/api/json/v1/1/search.php?s=${decodedFood}`;
 
     fetch(url)
-        .then((response) => response.json())
-        .then((response) => {
-            const recipe = document.getElementById("recipe");
-            const meal = response.meals[0];
-            let ingredientList = [];
+        .then(
+            (response) => response.json(),
+            () => alert("There was an error with the response."),
+        )
+        .then(
+            (response) => {
+                const recipe = document.getElementById("recipe");
 
-            // Grab all the ingredients if it's not null
-            for (let i = 1; i <= 20; i++) {
-                let ingredientKey = `strIngredient${i}`;
-                let measureKey = `strMeasure${i}`;
+                // Check if the API returned empty or more than 1 item
+                if (response.meals == null || response.meals.length > 1) {
+                    recipe.innerHTML = `<p id="error">There is an error with the API response.</p>`;
+                } else {
+                    const meal = response.meals[0];
+                    let ingredientList = [];
 
-                if (
-                    meal[measureKey] == null ||
-                    meal[ingredientKey] == null ||
-                    meal[measureKey] == "" ||
-                    meal[ingredientKey] == ""
-                )
-                    continue;
+                    // Grab all the ingredients if it's not null
+                    for (let i = 1; i <= 20; i++) {
+                        let ingredientKey = `strIngredient${i}`;
+                        let measureKey = `strMeasure${i}`;
 
-                ingredientList.push(
-                    `<li>${meal[measureKey]} ${meal[ingredientKey]}</li>`,
-                );
-            }
+                        if (
+                            meal[measureKey] == null ||
+                            meal[ingredientKey] == null ||
+                            meal[measureKey] == "" ||
+                            meal[ingredientKey] == ""
+                        )
+                            continue;
 
-            // Format the instructions
-            let instructions = `<p>${meal.strInstructions}</p>`;
+                        ingredientList.push(
+                            `<li>${meal[measureKey]} ${meal[ingredientKey]}</li>`,
+                        );
+                    }
 
-            recipe.innerHTML = `
+                    // Format the instructions
+                    let instructions = `<p>${meal.strInstructions}</p>`;
+
+                    recipe.innerHTML = `
                 <h2>Ingredients</h2>
                 <ul>
                 ${ingredientList.join("")}
@@ -139,7 +173,10 @@ function getRecipe(food) {
                 <h2>Instructions</h2>
                 ${instructions}
             `;
-        })
+                }
+            },
+            () => alert("There was an error with handling the response."),
+        )
         .catch((error) => {
             console.error(`An error has occurred: ${error}`);
         });
