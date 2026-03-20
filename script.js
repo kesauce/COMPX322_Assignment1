@@ -137,8 +137,8 @@ function getRecipe(food) {
             (response) => {
                 const recipe = document.getElementById("recipe");
 
-                // Check if the API returned empty or more than 1 item
-                if (response.meals == null || response.meals.length > 1) {
+                // Check if the API returned empty
+                if (response.meals == null) {
                     recipe.innerHTML = `<p id="error">There is an error with the API response.</p>`;
                 } else {
                     const meal = response.meals[0];
@@ -166,6 +166,7 @@ function getRecipe(food) {
                     let instructions = `<p>${meal.strInstructions}</p>`;
 
                     recipe.innerHTML = `
+                <h1>${decodedFood}</h1>
                 <h2>Ingredients</h2>
                 <ul>
                 ${ingredientList.join("")}
